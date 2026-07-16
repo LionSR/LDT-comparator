@@ -1,6 +1,6 @@
 name = "MIPStarREComparator"
 version = "0.1.0"
-defaultTargets = ["Challenge", "Solution"]
+defaultTargets = ["MIPStarREComparator", "Challenge", "Solution"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -19,3 +19,6 @@ name = "Challenge"
 
 [[lean_lib]]
 name = "Solution"
+
+[[lean_lib]]
+name = "MIPStarREComparator"
