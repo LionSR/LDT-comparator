@@ -331,28 +331,26 @@ theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
   rw [_root_.Polynomial.comp_assoc]
   simp [addCoord, add_left_comm, add_comm]
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:138-148  (MIPStarRE.LDT.AxisLinePolynomial.reparamAtEquiv)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:138-146  (MIPStarRE.LDT.AxisLinePolynomial.reparamAtEquiv)
 /-- Reparametrization by translation is an equivalence on axis-line answers. -/
 noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
     (t : Fq params) : AxisLinePolynomial params ≃ AxisLinePolynomial params where
   toFun := fun f => reparamAt f t
   invFun := fun f => reparamAt f (subCoord zeroCoord t)
-  left_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
-  right_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+  left_inv := fun f => (reparamAt_reparamAt f t (subCoord zeroCoord t)).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_right zeroCoord t)).trans (reparamAt_zero f))
+  right_inv := fun f => (reparamAt_reparamAt f (subCoord zeroCoord t) t).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_left zeroCoord t)).trans (reparamAt_zero f))
 end AxisLinePolynomial
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:200-203  (MIPStarRE.LDT.DiagonalLinePolynomial)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:194-197  (MIPStarRE.LDT.DiagonalLinePolynomial)
 /-- Diagonal-line answers are genuine univariate degree-`md` polynomials. -/
 structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.m * params.d
 namespace DiagonalLinePolynomial
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:212-215  (MIPStarRE.LDT.DiagonalLinePolynomial.toFun)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:206-209  (MIPStarRE.LDT.DiagonalLinePolynomial.toFun)
 /-- Evaluation of a diagonal-line answer on the line parameter. -/
 noncomputable def toFun {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) : Fq params → Fq params :=
@@ -363,7 +361,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:221-228  (MIPStarRE.LDT.DiagonalLinePolynomial.ext)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:215-222  (MIPStarRE.LDT.DiagonalLinePolynomial.ext)
 @[ext] theorem ext {params : Parameters} [FieldModel params.q]
     {f g : DiagonalLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
   cases f with
@@ -373,7 +371,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
           cases hpoly
           congr
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:230-246  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:224-240  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt)
 /-- Reparametrize a diagonal-line answer by translating the line parameter.
 
 Concretely, the underlying univariate polynomial `f.poly` (over `Scalar params` in
@@ -392,14 +390,14 @@ noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
   poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
   degreeBounded := natDegree_comp_C_add_X_le f.poly (decodeScalar t) f.degreeBounded
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:258-262  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt_zero)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:252-256  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt_zero)
 @[simp] theorem reparamAt_zero {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) :
     reparamAt f zeroCoord = f := by
   refine DiagonalLinePolynomial.ext ?_
   simp [reparamAt, zeroCoord]
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:274-283  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt_reparamAt)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:268-277  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt_reparamAt)
 theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (t s : Fq params) :
     reparamAt (reparamAt f t) s = reparamAt f (addCoord t s) := by
@@ -411,18 +409,16 @@ theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
   rw [_root_.Polynomial.comp_assoc]
   simp [addCoord, add_left_comm, add_comm]
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:285-295  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAtEquiv)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:279-287  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAtEquiv)
 /-- Reparametrization by translation is an equivalence on diagonal-line answers. -/
 noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
     (t : Fq params) : DiagonalLinePolynomial params ≃ DiagonalLinePolynomial params where
   toFun := fun f => reparamAt f t
   invFun := fun f => reparamAt f (subCoord zeroCoord t)
-  left_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
-  right_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+  left_inv := fun f => (reparamAt_reparamAt f t (subCoord zeroCoord t)).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_right zeroCoord t)).trans (reparamAt_zero f))
+  right_inv := fun f => (reparamAt_reparamAt f (subCoord zeroCoord t) t).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_left zeroCoord t)).trans (reparamAt_zero f))
 end DiagonalLinePolynomial
 
 -- source: MIPStarRE/LDT/Basic/QuantumState.lean:14-27  (MIPStarRE.LDT.QuantumState)
@@ -597,7 +593,7 @@ noncomputable instance (params : Parameters) [FieldModel params.q] :
       cases g; cases g'
       simpa using congrArg Subtype.val h
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementCore.lean:67-70  (MIPStarRE.LDT.ProjMeas)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementCore.lean:73-76  (MIPStarRE.LDT.ProjMeas)
 /-- A paper-local projective measurement (complete POVM + projective). -/
 structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [DecidableEq ι]
     extends Measurement α ι where
@@ -625,29 +621,23 @@ def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
   fun q => (A q).toSubMeas
 end IdxProjMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:76-94  (MIPStarRE.LDT.postprocess)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:76-88  (MIPStarRE.LDT.postprocess)
+open scoped Classical in
 /-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
 sum of the operators of all `a` with `f a = b`. -/
 noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (A : SubMeas α ι) (f : α → β) :
-    SubMeas β ι := by
-  classical
-  exact {
-    outcome := fun b =>
-      ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
-    total := A.total
-    outcome_pos := by
-      intro b
-      exact Finset.sum_nonneg fun a _ => A.outcome_pos a
-    sum_eq_total := by
-      rw [← A.sum_eq_total]
-      simpa using Finset.sum_fiberwise Finset.univ f A.outcome
-    total_le_one := A.total_le_one
-  }
+    SubMeas β ι where
+  outcome := fun b =>
+    ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
+  total := A.total
+  outcome_pos := fun _ => Finset.sum_nonneg fun a _ => A.outcome_pos a
+  sum_eq_total := (Finset.sum_fiberwise Finset.univ f A.outcome).trans A.sum_eq_total
+  total_le_one := A.total_le_one
 namespace SubMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:129-146  (MIPStarRE.LDT.SubMeas.transport)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:123-132  (MIPStarRE.LDT.SubMeas.transport)
 /-- Transport a submeasurement along an equivalence of outcome types. -/
 noncomputable def transport {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -655,21 +645,13 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     SubMeas β ι where
   outcome := fun b => A.outcome (e.symm b)
   total := A.total
-  outcome_pos := by
-    intro b
-    exact A.outcome_pos (e.symm b)
-  sum_eq_total := by
-    classical
-    calc
-      ∑ b : β, A.outcome (e.symm b)
-          = ∑ a : α, A.outcome a := by
-              simpa using (Equiv.sum_comp e (fun b => A.outcome (e.symm b))).symm
-      _ = A.total := A.sum_eq_total
+  outcome_pos := fun b => A.outcome_pos (e.symm b)
+  sum_eq_total := (Equiv.sum_comp e.symm A.outcome).trans A.sum_eq_total
   total_le_one := A.total_le_one
 end SubMeas
 namespace Measurement
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:286-292  (MIPStarRE.LDT.Measurement.transport)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:272-278  (MIPStarRE.LDT.Measurement.transport)
 /-- Transport a measurement along an equivalence of outcome types. -/
 noncomputable def transport {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -680,19 +662,17 @@ noncomputable def transport {α β : Type*} {ι : Type*}
 end Measurement
 namespace ProjMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:344-352  (MIPStarRE.LDT.ProjMeas.transport)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:328-334  (MIPStarRE.LDT.ProjMeas.transport)
 /-- Transport a projective measurement along an equivalence of outcome types. -/
 noncomputable def transport {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
     (e : α ≃ β) (A : ProjMeas α ι) :
     ProjMeas β ι where
   toMeasurement := Measurement.transport e A.toMeasurement
-  proj := by
-    intro b
-    simpa [Measurement.transport, SubMeas.transport] using A.proj (e.symm b)
+  proj := fun b => A.proj (e.symm b)
 end ProjMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:450-454  (MIPStarRE.LDT.constSubMeasFamily)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:420-424  (MIPStarRE.LDT.constSubMeasFamily)
 /-- Constant indexed family taking the same submeasurement on every question. -/
 def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
     (A : SubMeas α ι) :
@@ -921,7 +901,7 @@ variable {params : Parameters} [FieldModel params.q]
 variable {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
 variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:339-344  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:330-335  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyA)
 /-- Alice's point answers in the axis-parallel branch: Alice receives `u`,
 the base point of the sampled line, and answers with `A^{A,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyA
@@ -929,7 +909,7 @@ noncomputable def axisParallelPointAnswerFamilyA
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:346-351  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:337-342  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyB)
 /-- Bob's point answers in the axis-parallel branch: Bob receives `u`,
 the base point of the sampled line, and answers with `A^{B,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyB
@@ -937,7 +917,7 @@ noncomputable def axisParallelPointAnswerFamilyB
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:353-364  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:344-355  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyA)
 /-- Alice's axis-parallel-line answers: Alice receives `ℓ`, answers with
 `B^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -951,7 +931,7 @@ noncomputable def axisParallelLineAnswerFamilyA
       ((strategy.axisParallelMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:366-377  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:357-368  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyB)
 /-- Bob's axis-parallel-line answers: Bob receives `ℓ`, answers with
 `B^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -965,7 +945,7 @@ noncomputable def axisParallelLineAnswerFamilyB
       ((strategy.axisParallelMeasurementB ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:379-384  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:370-375  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyA)
 /-- Alice's point answers in the restricted diagonal branch: Alice receives the
 sampled base point `u` and answers with `A^{A,u}`. -/
 noncomputable def diagonalPointAnswerFamilyA
@@ -973,7 +953,7 @@ noncomputable def diagonalPointAnswerFamilyA
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:386-391  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:377-382  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyB)
 /-- Bob's point answers in the restricted diagonal branch: Bob receives the
 sampled base point `u` and answers with `A^{B,u}`. -/
 noncomputable def diagonalPointAnswerFamilyB
@@ -981,7 +961,7 @@ noncomputable def diagonalPointAnswerFamilyB
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:393-405  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:384-396  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyA)
 /-- Alice's restricted diagonal-line answers: Alice receives `ℓ`, answers with
 `L^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -996,7 +976,7 @@ noncomputable def diagonalLineAnswerFamilyA
       ((strategy.diagonalMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:407-419  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:398-410  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyB)
 /-- Bob's restricted diagonal-line answers: Bob receives `ℓ`, answers with
 `L^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -1011,7 +991,7 @@ noncomputable def diagonalLineAnswerFamilyB
       ((strategy.diagonalMeasurementB ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:421-428  (MIPStarRE.LDT.ProjStrat.axisParallelLineLeftPointRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:412-419  (MIPStarRE.LDT.ProjStrat.axisParallelLineLeftPointRightFailureProbability)
 /-- Axis-parallel branch component where Alice receives the sampled line and Bob
 receives its base point. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
@@ -1021,7 +1001,7 @@ noncomputable def axisParallelLineLeftPointRightFailureProbability
     (axisParallelLineAnswerFamilyA strategy)
     (axisParallelPointAnswerFamilyB strategy)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:430-437  (MIPStarRE.LDT.ProjStrat.axisParallelPointLeftLineRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:421-428  (MIPStarRE.LDT.ProjStrat.axisParallelPointLeftLineRightFailureProbability)
 /-- Axis-parallel branch component where Alice receives the sampled base point
 and Bob receives the sampled line. -/
 noncomputable def axisParallelPointLeftLineRightFailureProbability
@@ -1031,7 +1011,7 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (axisParallelPointAnswerFamilyA strategy)
     (axisParallelLineAnswerFamilyB strategy)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:439-444  (MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:430-435  (MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage)
 /-- The paper's axis-parallel branch for a two-space general strategy, averaged
 over the two role choices. -/
 noncomputable def axisParallelRoleAverage
@@ -1039,7 +1019,7 @@ noncomputable def axisParallelRoleAverage
   (axisParallelLineLeftPointRightFailureProbability strategy +
     axisParallelPointLeftLineRightFailureProbability strategy) / 2
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:446-453  (MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:437-444  (MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability)
 /-- Point-agreement branch: both provers receive the same point and the verifier
 checks equality of their field answers. -/
 noncomputable def pointAgreementFailureProbability
@@ -1049,7 +1029,7 @@ noncomputable def pointAgreementFailureProbability
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:455-464  (MIPStarRE.LDT.ProjStrat.diagonalLineLeftPointRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:446-455  (MIPStarRE.LDT.ProjStrat.diagonalLineLeftPointRightFailureProbability)
 /-- Diagonal branch component where Alice receives the sampled diagonal line and
 Bob receives its base point. -/
 noncomputable def diagonalLineLeftPointRightFailureProbability
@@ -1061,7 +1041,7 @@ noncomputable def diagonalLineLeftPointRightFailureProbability
         (diagonalLineAnswerFamilyA strategy j)
         (diagonalPointAnswerFamilyB strategy j)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:466-475  (MIPStarRE.LDT.ProjStrat.diagonalPointLeftLineRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:457-466  (MIPStarRE.LDT.ProjStrat.diagonalPointLeftLineRightFailureProbability)
 /-- Diagonal branch component where Alice receives the sampled base point and
 Bob receives the sampled diagonal line. -/
 noncomputable def diagonalPointLeftLineRightFailureProbability
@@ -1073,7 +1053,7 @@ noncomputable def diagonalPointLeftLineRightFailureProbability
         (diagonalPointAnswerFamilyA strategy j)
         (diagonalLineAnswerFamilyB strategy j)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:477-482  (MIPStarRE.LDT.ProjStrat.diagonalRoleAverage)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:468-473  (MIPStarRE.LDT.ProjStrat.diagonalRoleAverage)
 /-- The paper's diagonal branch for a two-space general strategy, averaged over
 the two role choices and the restricted diagonal samples. -/
 noncomputable def diagonalRoleAverage
@@ -1081,7 +1061,7 @@ noncomputable def diagonalRoleAverage
   (diagonalLineLeftPointRightFailureProbability strategy +
     diagonalPointLeftLineRightFailureProbability strategy) / 2
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:484-494  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:475-485  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
@@ -1094,7 +1074,7 @@ noncomputable def lowIndividualDegreeFailureProbability
   (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
     strategy.diagonalRoleAverage) / 3
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:496-500  (MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:487-491  (MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest)
 /-- Passing the full low-individual-degree test with error `ε`, for the
 paper-faithful two-space strategy container. -/
 structure PassesLowIndividualDegreeTest
