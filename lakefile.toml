@@ -1,0 +1,21 @@
+name = "MIPStarREComparator"
+version = "0.1.0"
+defaultTargets = ["Challenge", "Solution"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "MIPStarRE"
+git = "https://github.com/LionSR/MIPStarRE.git"
+# Pin to the audited library commit; bump together with a regenerated
+# Challenge.lean (see the MIPStarRE repository's docs/comparator.md).
+rev = "1ee5fc0611b4ec7c8ac0d3ed9bee0e4dd525adcb"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

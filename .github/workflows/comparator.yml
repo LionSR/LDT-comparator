@@ -1,0 +1,63 @@
+name: Comparator verification
+
+# Runs the official leanprover/comparator: the MIPStarRE library (pinned in
+# lakefile.toml) proves exactly the statement in Challenge.lean using only
+# propext, Quot.sound, Classical.choice, replayed through the Lean kernel and
+# the independent nanoda kernel.  See the Validating Proofs chapter of the
+# Lean reference manual for the trust model.
+#
+# The systemd-run guard from the comparator README is omitted: it hardens
+# against landrun escapes by untrusted solutions, and both modules here come
+# from this trusted checkout.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'  # weekly: catch upstream tool or cache drift
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  comparator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check Challenge.lean imports only Mathlib
+        run: |
+          bad=$(grep -E '^import' Challenge.lean | grep -v '^import Mathlib$' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::Challenge.lean must import only Mathlib, found: $bad"
+            exit 1
+          fi
+
+      - name: Free disk space before Lean setup
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          if [ -n "${AGENT_TOOLSDIRECTORY:-}" ]; then
+            sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          fi
+          df -h
+
+      - name: Build Challenge and Solution (with lean4checker re-check)
+        uses: leanprover/lean-action@v1
+        with:
+          lean4checker: true
+
+      - name: Cache verification tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            landrun/landrun
+            comparator/.lake
+            nanoda_lib/target/release/nanoda_bin
+          key: comparator-tools-${{ hashFiles('lean-toolchain', 'verify.sh') }}
+
+      - name: Run comparator
+        run: ./verify.sh
