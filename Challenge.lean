@@ -685,9 +685,9 @@ separate local carriers `ιA` and `ιB`, and the bipartite state lives on
 The `isNormalized` field records that the bipartite state's density operator
 has normalized trace `1`.
 
-Lean's four covariance fields state direct outcome descent; `SymStrat` uses
-transport covariance, and the evaluation predicates record zero-coordinate
-consequences. -/
+The four covariance conditions express that the line-indexed projectors
+descend from chosen affine parametrizations to geometric lines; transport and
+zero-coordinate evaluation are equivalent consequences. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ιA : Type*) [Fintype ιA] [DecidableEq ιA]
     (ιB : Type*) [Fintype ιB] [DecidableEq ιB] where
