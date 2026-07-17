@@ -50,6 +50,12 @@ jobs:
         with:
           leanchecker: true
 
+      - name: Set up Go for landrun
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: false
+
       - name: Cache verification tools
         uses: actions/cache@v4
         with:
