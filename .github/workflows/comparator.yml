@@ -45,10 +45,16 @@ jobs:
           fi
           df -h
 
-      - name: Build Challenge and Solution (with lean4checker re-check)
+      - name: Build Challenge and Solution (with leanchecker re-check)
         uses: leanprover/lean-action@v1
         with:
-          lean4checker: true
+          leanchecker: true
+
+      - name: Set up Go for landrun
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: false
 
       - name: Cache verification tools
         uses: actions/cache@v4

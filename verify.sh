@@ -10,8 +10,8 @@ set -euxo pipefail
 cd "$(dirname "$0")"
 
 TOOLCHAIN_TAG=$(sed 's/.*://' lean-toolchain)
-LANDRUN_REV="v0.1.15"
-NANODA_REV="v0.3.2"
+LANDRUN_REV="main"
+NANODA_REV="master"
 
 CONFIG=comparator.json
 if [ "${1:-}" = "--fake-landrun" ]; then
