@@ -12,7 +12,7 @@ name = "MIPStarRE"
 git = "https://github.com/LionSR/MIPStarRE.git"
 # Pin to the audited library commit; bump together with a regenerated
 # Challenge.lean (see the MIPStarRE repository's docs/comparator.md).
-rev = "d49abc92f504c78ad6488f7c91bef0cfe849656a"
+rev = "d22ddbb03bd9598504eeb92e69fbe6cdf4dbc06b"
 
 [[lean_lib]]
 name = "Challenge"

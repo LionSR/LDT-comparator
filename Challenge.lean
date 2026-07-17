@@ -674,7 +674,7 @@ instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.
     Nonempty (RestrictedDiagonalSample params j) :=
   inferInstance
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:761-804  (MIPStarRE.LDT.ProjStrat)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:761-808  (MIPStarRE.LDT.ProjStrat)
 /-- Paper-faithful two-space projective strategy data.
 
 This matches the paper's `def:general-projective-strategy`
@@ -719,6 +719,10 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
     AxisParallelMeasurementReparamInvariant params axisParallelMeasurementB
   /-- Bob's diagonal-line measurement family, acting on `ιB`. -/
   diagonalMeasurementB :
+    IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ιB
+  /-- Bob's diagonal measurement is covariant under line rebasing. -/
+  diagonalReparamInvariantB :
+    DiagonalMeasurementReparamInvariant params diagonalMeasurementB
 namespace ProjStrat
 
 -- elaboration context of MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean
