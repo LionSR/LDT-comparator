@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Metadata for the MIPStarRE formalization of the main soundness theorem
+# for the quantum low individual degree test.
+version: "v0.4"
+
+project:
+  name: LDT-comparator
+  authors:
+    - Sirui Lu
+    - Ruixuan Deng
+    - Zhengfeng Ji
+  responsible_maintainers:
+    - Sirui Lu
+    - Ruixuan Deng
+    - Zhengfeng Ji
+  license: Apache-2.0
+  short_description: >
+    Formalization of the corrected main soundness theorem for the quantum low
+    individual degree test.
+
+repository:
+  role: thin-wrapper
+  substantive_formalization:
+    id: LionSR/MIPStarRE
+    revision: 892b939c541e90192a8c77917cbb106678fd43b3
+
+sources:
+  - title: Quantum soundness of the classical low individual degree test
+    authors:
+      - Zhengfeng Ji
+      - Anand Natarajan
+      - Thomas Vidick
+      - John Wright
+      - Henry Yuen
+    id: arXiv:2009.12982
+    type: paper
+    location: "Theorem thm:main-formal"
+    relationship: adapts
+    author_endorsement: participated
+
+related_formalizations: []
+
+classification:
+  arxiv:
+    - quant-ph
+    - cs.CC
+  msc2020:
+    - 81P45
+    - 68Q15
+
+result:
+  name: mainFormal
+  statement: >
+    Let a projective two-prover strategy for the low individual degree test
+    over a field of order q fail with probability at most epsilon. If k is
+    positive and k is at least 400 m d, then each prover has a projective
+    measurement indexed by m-variate polynomials of individual degree at most
+    d. The two measurements are consistent with one another and, after
+    evaluation, with the provers' point measurements, up to error
+    100000 k^2 m^4 (epsilon^(1/40000) + (d/q)^(1/40000)
+    + exp(-k/(2560000 m^2))).
+  compared_declaration: MIPStarRE.LDT.Test.mainFormal
+  axioms:
+    - propext
+    - Quot.sound
+    - Classical.choice
+  sorries: 0
+
+status:
+  scope: >
+    The main soundness theorem for the two-prover quantum low individual degree
+    test, with the two corrections described below.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms:
+    - propext
+    - Quot.sound
+    - Classical.choice
+  main_results:
+    - declaration: MIPStarRE.LDT.Test.mainFormal
+      file: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean
+      sorry_count: 0
+      axioms:
+        - propext
+        - Quot.sound
+        - Classical.choice
+      comparator_config: comparator.json
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: agent
+      tool_setup: Most of the Lean code was written and checked by AI agents.
+    - method: manual
+      tool_setup: The authors chose the statements and checked them against the paper.
+
+fidelity:
+  divergences: >
+    The paper states k is at least m d. The formal theorem requires k to be at
+    least 400 m d and also assumes k > 0. The second condition excludes the
+    zero-sampling case, where the error bound in the printed statement vanishes.
+
+review:
+  status: self-assessed
+  reviewers:
+    -  Zhengfeng Ji
+  notes: >
+    The authors checked the formalization against the paper. It has not received
+    independent peer review.
+
+alignment:
+  namespace: MIPStarRE.LDT.Test
+  statements:
+    - source: "arXiv:2009.12982, theorem thm:main-formal, with documented corrections"
+      lean: MIPStarRE.LDT.Test.mainFormal
+      module: MIPStarRE.LDT.Test.MainTheorem.MainFormal
+      status: proved
