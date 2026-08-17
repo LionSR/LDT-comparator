@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
-# Metadata for the Comparator wrapper around the MIPStarRE formalization of
-# the quantum low individual degree test's main soundness theorem.
+# Metadata for the MIPStarRE formalization of the main soundness theorem
+# for the quantum low individual degree test.
 version: "v0.4"
 
 project:
@@ -15,9 +15,8 @@ project:
     - Zhengfeng Ji
   license: Apache-2.0
   short_description: >
-    Comparator wrapper certifying that the MIPStarRE library proves the
-    corrected main soundness theorem for the quantum low individual degree
-    test from a self-contained Mathlib-only statement.
+    Formalization of the corrected main soundness theorem for the quantum low
+    individual degree test.
 
 repository:
   role: thin-wrapper
@@ -38,9 +37,6 @@ sources:
     location: "Theorem thm:main-formal"
     relationship: adapts
     author_endorsement: participated
-    note: >
-      The formal theorem incorporates two documented boundary corrections to
-      the printed statement: k is positive and k is at least 400 m d.
 
 related_formalizations: []
 
@@ -55,29 +51,25 @@ classification:
 result:
   name: mainFormal
   statement: >
-    For a projective two-prover strategy for the low individual degree test
-    over a finite field, passing the test with failure probability at most
-    epsilon implies the existence of polynomial measurements for both provers
-    that are mutually consistent and consistent with the point measurements,
-    with the explicit error bound encoded by mainFormalError.
+    Let a projective two-prover strategy for the low individual degree test
+    over a field of order q fail with probability at most epsilon. If k is
+    positive and k is at least 400 m d, then each prover has a projective
+    measurement indexed by m-variate polynomials of individual degree at most
+    d. The two measurements are consistent with one another and, after
+    evaluation, with the provers' point measurements, up to error
+    100000 k^2 m^4 (epsilon^(1/40000) + (d/q)^(1/40000)
+    + exp(-k/(2560000 m^2))).
   compared_declaration: MIPStarRE.LDT.Test.mainFormal
   axioms:
     - propext
     - Quot.sound
     - Classical.choice
   sorries: 0
-  scope_limitations: >
-    This is the corrected theorem formalized by MIPStarRE, not the literal
-    printed statement: it assumes k is positive and k is at least 400 m d.
-    Comparator verifies that the pinned library proves the Challenge statement;
-    it does not independently establish the Challenge's alignment with the
-    paper.
 
 status:
   scope: >
-    Comparator wrapper for MIPStarRE.LDT.Test.mainFormal. Challenge.lean gives
-    the Mathlib-only statement closure, and Solution.lean imports the pinned
-    substantive proof library.
+    The main soundness theorem for the two-prover quantum low individual degree
+    test, with the two corrections described below.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms:
@@ -98,40 +90,23 @@ status:
 automation:
   methods:
     - method: agent
-      framework: TeXRA multi-agent Lean development
-      tool_setup: >
-        Specialized Lean proof, search, simplification, blueprint, and review
-        agents worked through a dependency-tracked formalization with compile,
-        source-alignment, proof-integrity, and review-repair loops. This wrapper
-        uses the substantive repository's deterministic statement-closure
-        generator and leanprover/comparator.
+      tool_setup: Most of the Lean code was written and checked by AI agents.
     - method: manual
-      tool_setup: >
-        Human maintainers selected goals, reviewed mathematical source
-        alignment and proof integrity, accepted changes, and controlled merges.
-  notes: >
-    Detailed run-level provenance is recorded in the substantive repository's
-    git history, pull requests, audits, and project documentation. Consolidated
-    project-wide cost figures are not reported here.
+      tool_setup: The authors chose the statements and checked them against the paper.
 
 fidelity:
   divergences: >
-    The formal theorem corrects two boundaries in the printed source statement:
-    it assumes k is at least 400 m d rather than k at least m d, and it assumes
-    0 < k to exclude the zero-sampling boundary where the displayed error term
-    vanishes. These corrections are documented in the substantive repository.
-    Challenge.lean contains the deliberate theorem placeholder expected by
-    Comparator; it is excluded from the proof-development sorry counts above.
+    The paper states k is at least m d. The formal theorem requires k to be at
+    least 400 m d and also assumes k > 0. The second condition excludes the
+    zero-sampling case, where the error bound in the printed statement vanishes.
 
 review:
   status: self-assessed
   reviewers:
     - Sirui Lu
   notes: >
-    The formalization received extensive automated and maintainer review, but
-    no independent peer-review claim is made here. Comparator verifies statement
-    identity, the permitted axiom set, Lean-kernel replay, and NanoDa replay; it
-    does not by itself validate alignment with the paper.
+    The authors checked the formalization against the paper. It has not received
+    independent peer review.
 
 alignment:
   namespace: MIPStarRE.LDT.Test
@@ -140,8 +115,3 @@ alignment:
       lean: MIPStarRE.LDT.Test.mainFormal
       module: MIPStarRE.LDT.Test.MainTheorem.MainFormal
       status: proved
-      note: Verified by the root comparator.json configuration.
-
-acknowledgements: >
-  Built on Lean 4, Mathlib, leanprover/comparator, lean4export, landrun, and
-  NanoDa.
