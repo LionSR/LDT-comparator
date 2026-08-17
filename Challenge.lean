@@ -371,48 +371,43 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
   ⟨Polynomial.toFun⟩
 end Polynomial
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:168-171  (MIPStarRE.LDT.ev)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:173-176  (MIPStarRE.LDT.ev)
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:180-184  (MIPStarRE.LDT.opTensor)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:185-189  (MIPStarRE.LDT.opTensor)
 /-- Tensor product of two operators via Kronecker product. -/
 abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker A B
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:224-226  (MIPStarRE.LDT.avgOver)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:218-220  (MIPStarRE.LDT.avgOver)
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 namespace Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:412-430  (MIPStarRE.LDT.Distribution.uniformOnFinset)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:404-417  (MIPStarRE.LDT.Distribution.uniformOnFinset)
 /-- The uniform distribution on a specified finite support.
 
 The stored support is `s`, and the weight of a point is the elementary finite
 uniform weight `1 / s.card` on `s` and `0` off `s`.  When the support is empty
 this gives the zero sub-probability distribution, matching the convention used
 for degenerate filtered supports in the LDT development. -/
-noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α := by
-  classical
-  exact
-    { support := s
-      weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
-      nonnegative := by
-        intro a
-        by_cases ha : a ∈ s
-        · simp [ha]
-        · simp [ha]
-      outsideSupport := by
-        intro a ha
-        simp [ha] }
+noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α :=
+  letI := Classical.decEq α
+  { support := s
+    weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
+    nonnegative := fun _ => by
+      split_ifs <;> positivity
+    outsideSupport := fun _ ha => by
+      simp [ha] }
 end Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:492-495  (MIPStarRE.LDT.uniformDistribution)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:479-482  (MIPStarRE.LDT.uniformDistribution)
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
@@ -559,7 +554,7 @@ noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [Decidabl
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
--- source: MIPStarRE/LDT/Test/Defs.lean:176-183  (MIPStarRE.LDT.qBipartiteMatchMass)
+-- source: MIPStarRE/LDT/Test/Defs.lean:175-182  (MIPStarRE.LDT.qBipartiteMatchMass)
 /-- Bipartite matching mass `∑_a ⟨ψ, (A_a ⊗ B_a) ψ⟩`, with `A` on the left
 register and `B` on the right register of a tensor-product state. -/
 noncomputable def qBipartiteMatchMass {Outcome : Type*}
@@ -569,7 +564,7 @@ noncomputable def qBipartiteMatchMass {Outcome : Type*}
     (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
   ∑ a, ev ψ (opTensor (A.outcome a) (B.outcome a))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:185-198  (MIPStarRE.LDT.qBipartiteConsDefect)
+-- source: MIPStarRE/LDT/Test/Defs.lean:184-197  (MIPStarRE.LDT.qBipartiteConsDefect)
 /-- Bipartite questionwise consistency defect.
 
 In the paper (Definition 4.8), the consistency of `A` on `H_A` and `B` on
@@ -585,7 +580,7 @@ noncomputable def qBipartiteConsDefect {Outcome : Type*}
   let totalOverlap := ev ψ (opTensor A.total B.total)
   max 0 (totalOverlap - qBipartiteMatchMass ψ A B)
 
--- source: MIPStarRE/LDT/Test/Defs.lean:200-207  (MIPStarRE.LDT.bipartiteConsError)
+-- source: MIPStarRE/LDT/Test/Defs.lean:199-206  (MIPStarRE.LDT.bipartiteConsError)
 /-- Averaged bipartite off-diagonal mass for consistency statements. -/
 noncomputable def bipartiteConsError {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -595,7 +590,7 @@ noncomputable def bipartiteConsError {Question Outcome : Type*}
     (B : IdxSubMeas Question Outcome ιB) : Error :=
   avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:239-251  (MIPStarRE.LDT.ConsRel)
+-- source: MIPStarRE/LDT/Test/Defs.lean:238-250  (MIPStarRE.LDT.ConsRel)
 /-- Consistency relation (bipartite, paper Definition 4.8).
 
 The state `ψ` lives on `H_A ⊗ H_B`, Alice's submeasurement `A` acts on
