@@ -7,8 +7,12 @@ project:
   name: LDT-comparator
   authors:
     - Sirui Lu
+    - Ruixuan Deng
+    - Zhengfeng Ji
   responsible_maintainers:
     - Sirui Lu
+    - Ruixuan Deng
+    - Zhengfeng Ji
   license: Apache-2.0
   short_description: >
     Comparator wrapper certifying that the MIPStarRE library proves the
