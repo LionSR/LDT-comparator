@@ -103,7 +103,7 @@ fidelity:
 review:
   status: self-assessed
   reviewers:
-    - Sirui Lu
+    -  Zhengfeng Ji
   notes: >
     The authors checked the formalization against the paper. It has not received
     independent peer review.
