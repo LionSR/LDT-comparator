@@ -10,7 +10,7 @@ set -euxo pipefail
 cd "$(dirname "$0")"
 
 TOOLCHAIN_TAG=$(sed 's/.*://' lean-toolchain)
-LANDRUN_REV="f59e83dbb4fd0af584dec5091168d0b35c8410b7"
+LANDRUN_REV="c91b41ac6cb180e2fdcb989408dcde34449bd8b0"
 NANODA_REV="f58f2f6d535e189a40fcb02ede8eb95f97a92d37"
 
 checkout_revision() {
