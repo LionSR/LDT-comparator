@@ -13,6 +13,16 @@ TOOLCHAIN_TAG=$(sed 's/.*://' lean-toolchain)
 LANDRUN_REV="f59e83dbb4fd0af584dec5091168d0b35c8410b7"
 NANODA_REV="f58f2f6d535e189a40fcb02ede8eb95f97a92d37"
 
+checkout_revision() {
+  local url="$1"
+  local rev="$2"
+  local dir="$3"
+  git init "$dir"
+  git -C "$dir" remote add origin "$url"
+  git -C "$dir" fetch --depth 1 origin "$rev"
+  git -C "$dir" checkout --detach FETCH_HEAD
+}
+
 CONFIG=comparator.json
 if [ "${1:-}" = "--fake-landrun" ]; then
   jq '.enable_nanoda = false' comparator.json > comparator.local.json
@@ -29,12 +39,12 @@ if [ "${1:-}" = "--fake-landrun" ]; then
   export COMPARATOR_LANDRUN="$PWD/comparator/scripts/fake-landrun.sh"
 else
   if [ ! -x landrun/landrun ]; then
-    git clone --depth 1 --branch "$LANDRUN_REV" https://github.com/Zouuup/landrun
+    checkout_revision https://github.com/Zouuup/landrun "$LANDRUN_REV" landrun
     (cd landrun && go build -o landrun ./cmd/landrun)
   fi
   export PATH="$PWD/landrun:$PATH"
   if [ ! -x nanoda_lib/target/release/nanoda_bin ]; then
-    git clone --depth 1 --branch "$NANODA_REV" https://github.com/ammkrn/nanoda_lib
+    checkout_revision https://github.com/ammkrn/nanoda_lib "$NANODA_REV" nanoda_lib
     (cd nanoda_lib && cargo build --release)
   fi
   export PATH="$PWD/nanoda_lib/target/release:$PATH"
