@@ -17,6 +17,12 @@ project:
   short_description: >
     Formalization of the corrected main soundness theorem for the quantum low
     individual degree test.
+  description: >
+    This project formalizes the main soundness theorem for the quantum low
+    individual degree test. It proves that a projective two-prover strategy
+    which passes the test admits polynomial measurements that are consistent
+    with one another and with the provers' point measurements, with an explicit
+    error bound.
 
 repository:
   role: thin-wrapper
@@ -103,7 +109,7 @@ fidelity:
 review:
   status: self-assessed
   reviewers:
-    -  Zhengfeng Ji
+    - Zhengfeng Ji
   notes: >
     The authors checked the formalization against the paper. It has not received
     independent peer review.
